@@ -86,7 +86,6 @@ class Initialize:
                             stage = "close" if idx == objCount and idxq == queriesCount else "start"
                             if q["generate"] == "parquet":
                                 pd.read_sql(q["query"], myDB).to_parquet(q["object_name"] + '.parquet')
-                                print(pd.read_sql(q["query"], myDB))
                             else:
                                 self.config.log.error(filePath, func, "File format [{}] not implemented".format(q["generate"]))
                                 continue
