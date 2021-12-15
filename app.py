@@ -39,7 +39,6 @@ class Initialize:
     def __init__(self):
         self.config = initialize()
         self.mySQL = MYSQL()
-        # self.handler = Handler(self.config)
 
     # def runServer(self):
     #     uvicorn.run(app, port=int(self.config.server.port), host=self.config.server.host, debug=True, log_config=None)
@@ -74,6 +73,7 @@ class Initialize:
                     self.config.log.error(filePath, func, "Empty response from Agent-Engine -> {}".format(response))
                     return
 
+                self.config.log.info(filePath, func, "Response from Agent-Engine -> {}".format(response))
                 fileList = glob.glob(os.path.join(os.getcwd(), "*.parquet"))
                 [os.remove(f) for f in fileList]
 
@@ -86,10 +86,11 @@ class Initialize:
                             stage = "close" if idx == objCount and idxq == queriesCount else "start"
                             if q["generate"] == "parquet":
                                 pd.read_sql(q["query"], myDB).to_parquet(q["object_name"] + '.parquet')
+                                print(pd.read_sql(q["query"], myDB))
                             else:
                                 self.config.log.error(filePath, func, "File format [{}] not implemented".format(q["generate"]))
                                 continue
-                            self.uploadFiles(q["object_name"] + '.parquet', q["object_name"], stage)
+                            self.uploadFiles(q["object_name"] + '.parquet', q["object_name"], stage, dId)
                             os.remove(q["object_name"] + '.parquet')
                     else:
                         self.config.log.error(filePath, func, "Connector type [{}] not implemented".format(obj["properties"]["conn_type"]))
@@ -97,12 +98,11 @@ class Initialize:
             _printException()
             self.config.log.error(filePath, func, "Error in getQueries -> {}".format(e))
 
-    def uploadFiles(self, fileName, objectName, stage):
+    def uploadFiles(self, fileName, objectName, stage, datasetId):
         func = inspect.currentframe()
         try:
-            with open(fileName, 'rb') as f:
-                httpResponse = requests.post("{}/dataset/upload/?token={}&object_name={}&stage={}".format(self.config.endpoints.agentEngine, self.config.staticToken, objectName, stage), data=f)
-
+            files = {'file': open(fileName, 'rb')}
+            httpResponse = requests.post("{}/dataset/upload/?token={}&object_name={}&stage={}&dataset_id={}".format(self.config.endpoints.agentEngine, self.config.staticToken, objectName, stage, datasetId), files=files)
             if httpResponse.status_code != 200:
                 self.config.log.error(filePath, func, "Error from Agent-Engine -> {}".format(httpResponse))
                 return False
