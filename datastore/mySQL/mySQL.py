@@ -7,7 +7,8 @@ class MYSQL:
 
 
     def connect(self, connectionString):
-        self.mydb = mysql.connector.connect(host=connectionString["host"], user=connectionString["username"],
+        url = connectionString["url"].split(":")
+        self.mydb = mysql.connector.connect(host=url[0], port=int(url[1]), user=connectionString["username"],
                                             password=connectionString["password"], database=connectionString["database"])
         return self.mydb
 

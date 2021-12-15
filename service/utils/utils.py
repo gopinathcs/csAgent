@@ -9,9 +9,11 @@
  * Reproduction or distribution, in whole or in part, is forbidden except by express written permission of ConverSight.ai.
 
 """
-
+import linecache
 import os
 import inspect
+import sys
+
 import requests
 import shortuuid
 import datetime as dt
@@ -58,3 +60,14 @@ def HTTPReq(url, method, timeout=None, data=None, config=Config()) -> (Any, Exce
     except Exception as err:
         config.log.error(filePath, func, "Exception while doing HTTP request -> {}".format(err))
         return None, err
+
+def _printException():
+    exc_type, exc_obj, tb = sys.exc_info()
+    f = tb.tb_frame
+    lineNo = tb.tb_lineno
+    filename = f.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename, lineNo, f.f_globals)
+    resp = 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineNo, line.strip(), exc_obj)
+    print(resp)
+    return resp

@@ -18,6 +18,7 @@ from tracing.tracing import Tracing
 from service.logger.logger import Log
 from datastore.datastore import Datastore
 from service.templates.queries import Queries
+from service.utils.utils import _printException
 
 
 filePath = os.path.relpath(__file__)
@@ -53,9 +54,6 @@ def initialize() -> Config():
         config.arango.userName = config.envValues['arango']['username'] = os.getenv("ARANGO_USER", configYML['ARANGO_USER'])
         config.arango.password = config.envValues['arango']['password'] = os.getenv("ARANGO_PASSWORD", configYML['ARANGO_PASSWORD'])
 
-        # Fetch Collections
-        config.arango.collections.resource = os.getenv("RESOURCE_COLLECTION", configYML['RESOURCE_COLLECTION'])
-
         # Fetch Redis Details
         config.redis.client = config.envValues['redis']['REDIS_SERVER'] = os.getenv("REDIS_SERVER", configYML['REDIS_SERVER'])
         config.redis.port = config.envValues['redis']['PORT'] = os.getenv("REDIS_PORT", configYML['REDIS_PORT'])
@@ -90,5 +88,5 @@ def initialize() -> Config():
         return config
 
     except Exception as err:
-        print("[{}][{}][{}] Exception while initializing config values -> {} " .format(filePath, func.f_code.co_name, func.f_lineno, err))
+        _printException()
         raise SystemExit()

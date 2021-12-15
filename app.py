@@ -29,6 +29,7 @@ __version__ = "0.1.0"
 from config.config import initialize
 from service.utils.utils import HTTPReq
 from datastore.mySQL.mySQL import MYSQL
+from service.utils.utils import _printException
 
 filePath = os.path.relpath(__file__)
 
@@ -52,7 +53,7 @@ class Initialize:
                 return
 
             for dIdx, dId in enumerate(datasetId):
-                request = "{}/dataset/queries/{}?token={}".format(self.config.endpoints.agent, dId, self.config.staticToken)
+                request = "{}/dataset/queries/{}?token={}".format(self.config.endpoints.agentEngine, dId, self.config.staticToken)
                 httpResponse, err = HTTPReq(url=request, method="GET", data=None, config=self.config)
 
                 if err is not None:
@@ -93,13 +94,14 @@ class Initialize:
                     else:
                         self.config.log.error(filePath, func, "Connector type [{}] not implemented".format(obj["properties"]["conn_type"]))
         except Exception as e:
+            _printException()
             self.config.log.error(filePath, func, "Error in getQueries -> {}".format(e))
 
     def uploadFiles(self, fileName, objectName, stage):
         func = inspect.currentframe()
         try:
             with open(fileName, 'rb') as f:
-                httpResponse = requests.post("{}/dataset/upload/?token={}&object_name={}&stage={}".format(self.config.endpoints.agent, self.config.staticToken, objectName, stage), data=f)
+                httpResponse = requests.post("{}/dataset/upload/?token={}&object_name={}&stage={}".format(self.config.endpoints.agentEngine, self.config.staticToken, objectName, stage), data=f)
 
             if httpResponse.status_code != 200:
                 self.config.log.error(filePath, func, "Error from Agent-Engine -> {}".format(httpResponse))
@@ -109,6 +111,7 @@ class Initialize:
             return True
 
         except Exception as e:
+            _printException()
             self.config.log.error(filePath, func, "Error in uploadFiles -> {}".format(e))
             return False
 
