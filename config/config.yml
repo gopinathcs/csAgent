@@ -3,7 +3,7 @@
 LOG_LEVEL: "DEBUG"
 
 #Static Token
-STATIC_TOKEN: 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfZG9jIjp7ImRhdGFTZXRJRCI6IjYxYmEyMDRjLWVIYU12aW9ubSIsIm9yZ0lkIjoiNWM5NzZkYmYtNDhhMi00Mzk0LWJkYWEtMjVjMzEwNTFjOTI3IiwiaXNFeHRlcm5hbEFQSSI6dHJ1ZSwiYWNjZXNzTGlzdCI6eyJyZWFkIjpbImxvYWQiXSwid3JpdGUiOlsiIl19fSwiaWF0IjoxNjM5NzYwODYwfQ.fxzIzdXFSFxyVLiOl9cUed10FWgRBsLLaoZ_5PMqHn0'
+STATIC_TOKEN: ''
 
 #Endpoints
 AGENT_ENGINE: "http://agent-engine.dev-platform.svc.cluster.local"
