@@ -37,3 +37,5 @@ requests == 2.25.1
 
 # csAgent/service/utils/utils.py: 16
 shortuuid == 1.0.1
+
+pyarrow == 4.0.1

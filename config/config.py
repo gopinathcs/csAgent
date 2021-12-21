@@ -20,7 +20,6 @@ from datastore.datastore import Datastore
 from service.templates.queries import Queries
 from service.utils.utils import _printException
 
-
 filePath = os.path.relpath(__file__)
 
 
@@ -46,7 +45,6 @@ def initialize() -> Config():
         config.server.port = config.envValues['server']['PORT'] = os.getenv("SERVER_PORT", configYML['SERVER_PORT'])
         config.server.envValues = config.envValues['server']['ENV'] = os.getenv("ENV", configYML['ENV'])
         config.staticToken = config.envValues['STATIC_TOKEN'] = os.getenv('STATIC_TOKEN', configYML['STATIC_TOKEN'])
-        config.datasetId = config.envValues['DATASET_ID'] = os.getenv('DATASET_ID', configYML['DATASET_ID'])
 
         # Fetch Arango Server Details
         config.arango.server = config.envValues['arango']['server'] = os.getenv("ARANGO_SERVER", configYML['ARANGO_SERVER'])

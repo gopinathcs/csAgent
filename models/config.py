@@ -88,6 +88,7 @@ class Config:
         self.jaeger = Jaeger()
         self.endpoints = EndPoints()
         self.queries = None
+        self.templates = None
         self.log = None
         self.tracer = None
 

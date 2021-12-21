@@ -31,6 +31,8 @@ from service.utils.utils import HTTPReq
 from datastore.mySQL.mySQL import MYSQL
 from service.utils.utils import _printException
 
+import service.templates.templates as templates
+
 filePath = os.path.relpath(__file__)
 
 
@@ -39,71 +41,131 @@ class Initialize:
     def __init__(self):
         self.config = initialize()
         self.mySQL = MYSQL()
+        self.notification = templates.notification
 
     # def runServer(self):
     #     uvicorn.run(app, port=int(self.config.server.port), host=self.config.server.host, debug=True, log_config=None)
 
-    def getQueries(self, datasetId=None):
+    def getQueries(self):
         func = inspect.currentframe()
         try:
-            datasetId = datasetId if datasetId else self.config.datasetId
-            if not datasetId:
-                self.config.log.error(filePath, func, "No dataset Id to get queries, skipping further process")
-                return
+            request = "{}/dataset/queries?token={}".format(self.config.endpoints.agentEngine, self.config.staticToken)
+            httpResponse, err = HTTPReq(url=request, method="GET", data=None, config=self.config)
 
-            for dIdx, dId in enumerate(datasetId):
-                request = "{}/dataset/queries/{}?token={}".format(self.config.endpoints.agentEngine, dId, self.config.staticToken)
-                httpResponse, err = HTTPReq(url=request, method="GET", data=None, config=self.config)
+            if err is not None:
+                self.notification["message"] = "Unable to obtain queries. Reason [{}]".format(err)
+                self.config.log.error(filePath, func, "{}".format(self.notification["message"]))
 
-                if err is not None:
-                    self.config.log.error(filePath, func, "Error Getting queries -> {}".format(err))
-                    return
+                request = "{}/slack/notification?token={}".format(self.config.endpoints.agentEngine, self.config.staticToken)
+                httpResponse, err = HTTPReq(url=request, method="POST", data=self.notification, config=self.config)
 
                 if httpResponse.status_code != 200:
-                    self.config.log.error(filePath, func, "Error from Agent-Engine -> {}".format(httpResponse))
+                    self.config.log.error(filePath, func, "Notification failed -> {}".format(err))
+
+                return
+
+            if httpResponse.status_code != 200:
+                self.notification["message"] = "Error from Agent-Engine. Reason [{}]".format(err)
+                self.config.log.error(filePath, func, "{}".format(self.notification["message"]))
+
+                request = "{}/slack/notification?token={}".format(self.config.endpoints.agentEngine,
+                                                                  self.config.staticToken)
+                httpResponse, err = HTTPReq(url=request, method="POST", data=self.notification, config=self.config)
+
+                if httpResponse.status_code != 200:
+                    self.config.log.error(filePath, func, "Notification failed -> {}".format(err))
+
+                return
+
+            response = httpResponse.json()
+
+            if not response or response["status"] != "success":
+                self.notification["message"] = "Failure response from Agent-Engine. Reason [{}]".format(response)
+                self.config.log.error(filePath, func, "{}".format(self.notification["message"]))
+
+                request = "{}/slack/notification?token={}".format(self.config.endpoints.agentEngine,
+                                                                  self.config.staticToken)
+                httpResponse, err = HTTPReq(url=request, method="POST", data=self.notification, config=self.config)
+
+                if httpResponse.status_code != 200:
+                    self.config.log.error(filePath, func, "Notification failed -> {}".format(err))
+
+                return
+
+            if not response["data"]:
+                self.notification["message"] = "Empty response from Agent-Engine. Reason [{}]".format(response)
+                self.config.log.error(filePath, func, "{}".format(self.notification["message"]))
+
+                request = "{}/slack/notification?token={}".format(self.config.endpoints.agentEngine,
+                                                                  self.config.staticToken)
+                httpResponse, err = HTTPReq(url=request, method="POST", data=self.notification, config=self.config)
+
+                if httpResponse.status_code != 200:
+                    self.config.log.error(filePath, func, "Notification failed -> {}".format(err))
+
+                return
+
+            self.config.log.info(filePath, func, "Response from Agent-Engine -> {}".format(response))
+            fileList = glob.glob(os.path.join(os.getcwd(), "*.parquet"))
+            [os.remove(f) for f in fileList]
+
+            objCount = len(response["data"]) - 1
+            for idx, obj in enumerate(response["data"]):
+                if obj["properties"]["conn_type"] == "MySQL":
+                    myDB = self.mySQL.connect(obj["properties"]["conn_prop"])
+                    queriesCount = len(obj["queries"]) - 1
+                    for idxq, q in enumerate(obj["queries"]):
+                        stage = "close" if idx == objCount and idxq == queriesCount else "start"
+                        if q["generate"] == "parquet":
+                            pd.read_sql(q["query"], myDB).to_parquet(q["object_name"] + '.parquet')
+                        else:
+                            self.config.log.error(filePath, func, "File format [{}] not implemented".format(q["generate"]))
+                            continue
+                        self.uploadFiles(q["object_name"] + '.parquet', q["object_name"], stage)
+                        os.remove(q["object_name"] + '.parquet')
+                else:
+                    self.notification["message"] = "Connector type [{}] not implemented".format(obj["properties"]["conn_type"])
+                    self.config.log.error(filePath, func, "{}".format(self.notification["message"]))
+
+                    request = "{}/slack/notification?token={}".format(self.config.endpoints.agentEngine,
+                                                                      self.config.staticToken)
+                    httpResponse, err = HTTPReq(url=request, method="POST", data=self.notification, config=self.config)
+
+                    if httpResponse.status_code != 200:
+                        self.config.log.error(filePath, func, "Notification failed -> {}".format(err))
+
                     return
 
-                response = httpResponse.json()
-
-                if not response or response["status"] != "success":
-                    self.config.log.error(filePath, func, "Failed response from Agent-Engine -> {}".format(response))
-                    return
-
-                if not response["data"]:
-                    self.config.log.error(filePath, func, "Empty response from Agent-Engine -> {}".format(response))
-                    return
-
-                self.config.log.info(filePath, func, "Response from Agent-Engine -> {}".format(response))
-                fileList = glob.glob(os.path.join(os.getcwd(), "*.parquet"))
-                [os.remove(f) for f in fileList]
-
-                objCount = len(response["data"]) - 1
-                for idx, obj in enumerate(response["data"]):
-                    if obj["properties"]["conn_type"] == "MySQL":
-                        myDB = self.mySQL.connect(obj["properties"]["conn_prop"])
-                        queriesCount = len(obj["queries"]) - 1
-                        for idxq, q in enumerate(obj["queries"]):
-                            stage = "close" if idx == objCount and idxq == queriesCount else "start"
-                            if q["generate"] == "parquet":
-                                pd.read_sql(q["query"], myDB).to_parquet(q["object_name"] + '.parquet')
-                            else:
-                                self.config.log.error(filePath, func, "File format [{}] not implemented".format(q["generate"]))
-                                continue
-                            self.uploadFiles(q["object_name"] + '.parquet', q["object_name"], stage, dId)
-                            os.remove(q["object_name"] + '.parquet')
-                    else:
-                        self.config.log.error(filePath, func, "Connector type [{}] not implemented".format(obj["properties"]["conn_type"]))
         except Exception as e:
             _printException()
-            self.config.log.error(filePath, func, "Error in getQueries -> {}".format(e))
+            self.notification["message"] = "Error in getQueries -> {}".format(str(e))
+            self.config.log.error(filePath, func, "{}".format(self.notification["message"]))
 
-    def uploadFiles(self, fileName, objectName, stage, datasetId):
+            request = "{}/slack/notification?token={}".format(self.config.endpoints.agentEngine,
+                                                              self.config.staticToken)
+            httpResponse, err = HTTPReq(url=request, method="POST", data=self.notification, config=self.config)
+
+            if httpResponse.status_code != 200:
+                self.config.log.error(filePath, func, "Notification failed -> {}".format(err))
+
+            return
+
+    def uploadFiles(self, fileName, objectName, stage):
         func = inspect.currentframe()
         try:
             files = {'file': open(fileName, 'rb')}
-            httpResponse = requests.post("{}/dataset/upload/?token={}&object_name={}&stage={}&dataset_id={}".format(self.config.endpoints.agentEngine, self.config.staticToken, objectName, stage, datasetId), files=files)
+            httpResponse = requests.post("{}/dataset/upload/?token={}&object_name={}&stage={}".format(self.config.endpoints.agentEngine, self.config.staticToken, objectName, stage), files=files)
             if httpResponse.status_code != 200:
-                self.config.log.error(filePath, func, "Error from Agent-Engine -> {}".format(httpResponse))
+                self.notification["message"] = "Error from Agent-Engine -> {}".format(httpResponse.reason)
+                self.config.log.error(filePath, func, "{}".format(self.notification["message"]))
+
+                request = "{}/slack/notification?token={}".format(self.config.endpoints.agentEngine,
+                                                                  self.config.staticToken)
+                httpResponse, err = HTTPReq(url=request, method="POST", data=self.notification, config=self.config)
+
+                if httpResponse.status_code != 200:
+                    self.config.log.error(filePath, func, "Notification failed -> {}".format(err))
+
                 return False
 
             self.config.log.info(filePath, func, "File [{}] sent to Agent-Engine".format(fileName))
@@ -111,7 +173,16 @@ class Initialize:
 
         except Exception as e:
             _printException()
-            self.config.log.error(filePath, func, "Error in uploadFiles -> {}".format(e))
+            self.notification["message"] = "Error in upload file -> {}".format(e)
+            self.config.log.error(filePath, func, "{}".format(self.notification["message"]))
+
+            request = "{}/slack/notification?token={}".format(self.config.endpoints.agentEngine,
+                                                              self.config.staticToken)
+            httpResponse, err = HTTPReq(url=request, method="POST", data=self.notification, config=self.config)
+
+            if httpResponse.status_code != 200:
+                self.config.log.error(filePath, func, "Notification failed -> {}".format(err))
+
             return False
 
 

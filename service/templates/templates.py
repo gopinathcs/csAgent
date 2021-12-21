@@ -10,6 +10,7 @@
 
 """
 
+
 tagMetadata = [
     {
         "name": "HealthZ",
@@ -20,3 +21,9 @@ tagMetadata = [
         "description": "Readiness check of infra-engine"
     }
 ]
+
+notification = {
+    "source": "cs-agent",
+    "process": "data-export",
+    "message": ""
+}
