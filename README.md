@@ -20,3 +20,6 @@ This agent will fetch queries from ConverSight.ai platform based on the token su
     1. Windows (https://www.python.org/downloads/windows/)
     2. Linux - Ubuntu (`sudo apt install python3.8`) 
     3. Mac (https://www.python.org/downloads/macos/)
+6. Once python is installed, install the necessary packages required by CS Agent from the **requirements.txt** file. Do the below step to install all the packages.
+    1. ``pip install -r /path/to/requirements.txt``
+    2. make sure pip is installed on your system
