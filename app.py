@@ -155,6 +155,7 @@ class Initialize:
         try:
             files = {'file': open(fileName, 'rb')}
             httpResponse = requests.post("{}/dataset/upload/?token={}&object_name={}&stage={}".format(self.config.endpoints.agentEngine, self.config.staticToken, objectName, stage), files=files)
+            files["file"].close()
             if httpResponse.status_code != 200:
                 self.notification["message"] = "Error from Agent-Engine -> {}".format(httpResponse.reason)
                 self.config.log.error(filePath, func, "{}".format(self.notification["message"]))
