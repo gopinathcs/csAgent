@@ -1,10 +1,10 @@
 
 #Log config
-LOG_LEVEL: "DEBUG"
+LOG_LEVEL: "ERROR"
 
 #Static Token
 STATIC_TOKEN: ''
 
 #Endpoints
-AGENT_ENGINE: "http://agent-engine.dev-platform.svc.cluster.local"
+AGENT_ENGINE: "https://api.conversight.ai/agent"
 
