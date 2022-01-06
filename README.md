@@ -16,6 +16,7 @@ CS Agent is an EL agent that extracts and loads data from databases behind a fir
 2. Change the configurations on the yaml file, it will be on the ***csAgent/config/config.yaml***
 3. For example, to change the **token**, look for the key **STATIC_TOKEN** and replace the value with your token.<br>
     Change ``STATIC_TOKEN: <TOKEN>`` to ``STATIC_TOKEN: 'JWT%20ajkshdjkfhaskjdhakshdfkahsdkjfhakdshf'``
+7. To get the token, please contact the ConverSight.ai team or login as an administrator and click to the Configure Dataset page.
 5. Run CS Agent with the following command once the setup is complete.
     1. python app.py 
 6. If you do not already have Python installed on your machine, please see the links below for instructions on how to do so.
