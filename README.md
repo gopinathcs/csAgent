@@ -14,7 +14,7 @@ CS Agent is an EL agent that extracts and loads data from databases behind a fir
 
 1. Click the green dropdown in the upper right corner to clone or download the repository, or click this link to download the repository directly.(https://github.com/ConverSight/csAgent/archive/refs/tags/v0.1.0.zip)
 2. Change the configurations on the yaml file, it will be on the ***csAgent/config/config.yaml***
-3. For example, to change the **token**, look for the key **STATIC_TOKEN** and replace the value with your token.
+3. For example, to change the **token**, look for the key **STATIC_TOKEN** and replace the value with your token.<br>
     Change ``STATIC_TOKEN: <TOKEN>`` to ``STATIC_TOKEN: 'JWT%20ajkshdjkfhaskjdhakshdfkahsdkjfhakdshf'``
 5. Run CS Agent with the following command once the setup is complete.
     1. python app.py 
