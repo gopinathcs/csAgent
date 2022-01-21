@@ -43,9 +43,11 @@ def initialize() -> Config():
         # Endpoints
         config.endpoints.agentEngine = config.envValues['endpoints']['AGENT_ENGINE'] = os.getenv("AGENT_ENGINE", configYML['AGENT_ENGINE'])
 
+        config.dbDetails.mySQL = configYML['mySQL']
+
         config.log = Log(config)
 
-        config.log.info(filePath, func, 'Env config details has been loaded -> {} '.format(config.envValues))
+        # config.log.info(filePath, func, 'Env config details has been loaded -> {} '.format(config.envValues))
 
         config.queries = Queries()
 

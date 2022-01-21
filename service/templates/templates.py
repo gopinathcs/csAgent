@@ -11,17 +11,6 @@
 """
 
 
-tagMetadata = [
-    {
-        "name": "HealthZ",
-        "description": "Health check of infra-engine"
-    },
-    {
-        "name": "ReadyZ",
-        "description": "Readiness check of infra-engine"
-    }
-]
-
 notification = {
     "source": "cs-agent",
     "process": "data-export",
