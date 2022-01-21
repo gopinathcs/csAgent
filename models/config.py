@@ -16,12 +16,18 @@ class EndPoints:
         self.agentEngine = ""
 
 
+class DBDetails:
+    def __init__(self):
+        self.mySQL = {}
+
+
 class Config:
     def __init__(self):
         self.serviceName = "CS-Agent"
         self.staticToken = ""
         self.envValues = {"log": {}, "endpoints": {}}
         self.endpoints = EndPoints()
+        self.dbDetails = DBDetails()
         self.queries = None
         self.templates = None
         self.log = None

@@ -1,10 +1,18 @@
 
 #Log config
-LOG_LEVEL: "ERROR"
+LOG_LEVEL: "DEBUG"
 
 #Static Token
-STATIC_TOKEN: ''
+STATIC_TOKEN: ""
 
 #Endpoints
-AGENT_ENGINE: "https://api.conversight.ai/agent"
+AGENT_ENGINE: "https://api.staging.conversight.ai/agent"
 
+#Database Details
+mySQL:
+  host: ""
+  port: ""
+  username: ""
+  password: ""
+  database: ""
+  timeout: 5

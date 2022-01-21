@@ -61,6 +61,7 @@ def HTTPReq(url, method, timeout=None, data=None, config=Config()) -> (Any, Exce
         config.log.error(filePath, func, "Exception while doing HTTP request -> {}".format(err))
         return None, err
 
+
 def _printException():
     exc_type, exc_obj, tb = sys.exc_info()
     f = tb.tb_frame
@@ -71,3 +72,10 @@ def _printException():
     resp = 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineNo, line.strip(), exc_obj)
     print(resp)
     return resp
+
+
+def validate(value):
+    whitelist = ["timeout", "frame", "message"]
+    for k, v in value.items():
+        if k not in whitelist and not v:
+            return "Value for the key [{}] is required..".format(k)

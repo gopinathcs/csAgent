@@ -52,8 +52,6 @@ class Log:
 
             self.log = logger
 
-            self.info(filePath, func, "Logger initiated successfully -> {} ".format(level))
-
             return logger
 
         except Exception as err:
