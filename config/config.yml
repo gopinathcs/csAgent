@@ -6,7 +6,7 @@ LOG_LEVEL: "DEBUG"
 STATIC_TOKEN: ""
 
 #Endpoints
-AGENT_ENGINE: "https://api.staging.conversight.ai/agent"
+AGENT_ENGINE: "https://api.conversight.ai/agent"
 
 #Database Details
 mySQL:
