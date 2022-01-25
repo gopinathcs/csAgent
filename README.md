@@ -19,13 +19,13 @@ CS Agent is an EL agent that extracts and loads data from databases behind a fir
 4. To get the token, please contact the ConverSight.ai team or login as an administrator and click to the Configure Dataset page.
 5. To add database credentials on the yaml file, look for the database key and replace the values with yours <br>
     For example, <br>
-    mySQL:<br>
-    &nbsp;&nbsp;&nbsp; host: "192.168.155.268"<br>
-    &nbsp;&nbsp;&nbsp; port: "1433"<br>
-    &nbsp;&nbsp;&nbsp; username: "test_user"<br>
-    &nbsp;&nbsp;&nbsp; password: "test_password"<br>
-    &nbsp;&nbsp;&nbsp; database: "test_db"<br>
-    &nbsp;&nbsp;&nbsp; timeout: 5<br>
+    ``mySQL:``<br>
+    &nbsp;&nbsp;&nbsp; ``host: "192.168.155.268"``<br>
+    &nbsp;&nbsp;&nbsp; ``port: "1433"``<br>
+    &nbsp;&nbsp;&nbsp; ``username: "test_user"``<br>
+    &nbsp;&nbsp;&nbsp; ``password: "test_password"``<br>
+    &nbsp;&nbsp;&nbsp; ``database: "test_db"``<br>
+    &nbsp;&nbsp;&nbsp; ``timeout: 5``<br>
 6. Run CS Agent with the following command once the setup is complete.
     1. python app.py 
 7. If you do not already have Python installed on your machine, please see the links below for instructions on how to do so.
